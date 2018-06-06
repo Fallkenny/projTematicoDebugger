@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\learquivos.c">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shoesBitmapProcessor.c">
+    <ClCompile Include="..\parcial.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\parcial.c">
+    <ClCompile Include="..\shoesBitmapProcessor.c">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\learquivos.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
