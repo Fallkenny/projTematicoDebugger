@@ -127,6 +127,31 @@ CABECALHO le_cabecalho_arquivo(char entrada[N])
 
 #pragma region Processamento BMP
 
+void desalocaMatriz (PIXEL** mat, int linha)
+{
+    int i;
+    for (i=0; i<linha; i++)
+    {
+        free(mat[i]);
+    }
+    free(mat);
+}
+
+void gravaArquivoBMP(CABECALHO cab, PIXEL** mat, char destino[N])
+{
+	int i, j;
+	FILE* output = fopen(destino, "wb");
+	fwrite(&cab, sizeof(CABECALHO), 1, output);
+	for (i = 0; i<cab.altura; i++)
+	{
+		for (j = 0; j<cab.largura; j++)
+		{
+			fwrite(&mat[i][j], sizeof(PIXEL), 1, output);
+		}
+	}
+	fclose(output);
+}
+
 void converteTonsCinza(PIXEL** mat, int altura, int largura)
 {
     unsigned int media;
@@ -197,8 +222,8 @@ void processaListaBMP(ARQUIVOS* lista, int tamLista)
 		lePixels(lista[i].nome, cabecalho, matriz);
 		converteTonsCinza(matriz, cabecalho.altura, cabecalho.largura);
 		////binarizarImagem <- implementar (Otsu ou K-Means)
-		gravaArquivoBMP(cabecalho, matriz, lista[i]);
-		//desalocaMatriz(matriz, cabecalho.altura); //não funciona adequadamente
+		gravaArquivoBMP(cabecalho, matriz, lista[i].nome);
+		desalocaMatriz(matriz, cabecalho.altura); //não funciona adequadamente
 	}
 
 }
@@ -237,6 +262,8 @@ int main(int argc, char **argv)
 		printf("%s\n", listaBMP[i].nome);
 
 	processaListaBMP(listaBMP, total);
+
+	printf("Finalizado!");
 
 	free(listaBMP);
 
