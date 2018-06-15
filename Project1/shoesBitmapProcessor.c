@@ -4,20 +4,19 @@
 
 #pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
 
-
 #define N 300
 #pragma pack(1)
 
-#pragma region Archives Struct
+// #pragma region Archives Struct
 
 struct archives {
 	char nome[N];
 };
 typedef struct archives ARQUIVOS;
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region Cabecalho Struct
+// #pragma region Cabecalho Struct
 
 
 struct cabecalho
@@ -41,9 +40,9 @@ struct cabecalho
 };
 typedef struct cabecalho CABECALHO;
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region Pixel Struct
+// #pragma region Pixel Struct
 
 struct pixel
 {
@@ -54,9 +53,13 @@ struct pixel
 };
 typedef struct pixel PIXEL;
 
-#pragma endregion
+//EXPERIMENTAL: protÃ³tipo para a funÃ§Ã£o de expandir os pixels.
+void expandirPixels(PIXEL** original, PIXEL** nova,int h, int l);
 
-#pragma region Leitura de arquivo texto
+
+// #pragma endregion
+
+// #pragma region Leitura de arquivo texto
 
 ARQUIVOS* leArquivo(char *nomeArq, int* totalFunc)
 {
@@ -96,9 +99,9 @@ ARQUIVOS* leArquivo(char *nomeArq, int* totalFunc)
 	return archives;
 }
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region Leitura de Arquivo bmp
+// #pragma region Leitura de Arquivo bmp
 
 CABECALHO le_cabecalho_arquivo(char entrada[N])
 {
@@ -123,9 +126,9 @@ CABECALHO le_cabecalho_arquivo(char entrada[N])
 	return cabecalho;
 }
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region Processamento BMP
+// #pragma region Processamento BMP
 
 void desalocaMatriz (PIXEL** mat, int linha)
 {
@@ -192,7 +195,7 @@ void lePixels(char entrada[N], CABECALHO header, PIXEL** mat)
 	arq = fopen(entrada, "rb");
 	if (arq == NULL)
 	{
-		printf(" !! Nao foi possível abrir o arquivo !!");
+		printf(" !! Nao foi possï¿½vel abrir o arquivo !!");
 		exit(0);
 	}
 
@@ -212,40 +215,95 @@ void processaListaBMP(ARQUIVOS* lista, int tamLista)
 {
 	int i = 0;
 	int tam = tamLista;
+
+	
 	
 	for (i = 0; i < tam; i++)
 	{
 		PIXEL** matriz;
+		PIXEL** matrizExpandida;
 		CABECALHO cabecalho;
 		cabecalho = le_cabecalho_arquivo(lista[i].nome);
 		matriz = alocaMatriz(cabecalho.altura, cabecalho.largura);
 		lePixels(lista[i].nome, cabecalho, matriz);
 		converteTonsCinza(matriz, cabecalho.altura, cabecalho.largura);
 		////binarizarImagem <- implementar (Otsu ou K-Means)
-		gravaArquivoBMP(cabecalho, matriz, lista[i].nome);
-		desalocaMatriz(matriz, cabecalho.altura); //não funciona adequadamente
-	}
 
+
+		/* EXPERIMENTAL: comentado para que o Sr. troque o caminho */
+		// if (i==0)
+		// {
+		// 	matrizExpandida = alocaMatriz(cabecalho.altura, cabecalho.largura);
+		// 	expandirPixels(matriz, matrizExpandida, cabecalho.altura, cabecalho.largura);
+		// 	gravaArquivoBMP(cabecalho, matrizExpandida, "/Users/rafael/ucs/projetotematico/projTematicoDebugger/Project1/teste.bmp");
+		// 	desalocaMatriz(matrizExpandida, cabecalho.altura);
+		// }
+		/* FIM: EXPERIMENTAL */
+
+		gravaArquivoBMP(cabecalho, matriz, lista[i].nome);
+		desalocaMatriz(matriz, cabecalho.altura);
+	}
 }
 
-#pragma endregion
+/* EXPERIMENTAL */
+void expandirPixels (PIXEL** original, PIXEL** nova, int h, int l)
+{
+	PIXEL black;
+	PIXEL red;
+	PIXEL eval;
+	black.R = black.G = black.B = 0;
+	red.R = 255;
+	red.G = red.B = 0;
+
+	
+	int x, y;
+	for (y=1; y<h-1; y++)
+	{
+		for (x=1; x<l-1; x++)
+		{
+			eval = original[x][y];
+			
+			if (eval.R == 0 && eval.G == 0 && eval.B == 0)
+			{
+				nova[x-1][y-1] = red;
+				nova[x-1][y]   = eval;
+				nova[x-1][y+1] = black;
+
+				nova[x][y-1] = eval;
+				nova[x][y]   = red;
+				nova[x][y+1] = eval;
+
+				nova[x+1][y-1] = black;
+				nova[x+1][y]   = eval;
+				nova[x+1][y+1] = red;
+			}
+		}
+	}
+}
+/* FIM: EXPERIMENTAL */
 
 
-#pragma region Funções Diversas
+// #pragma endregion
 
 
-#pragma endregion
+// #pragma region Funï¿½ï¿½es Diversas
 
 
-#pragma region Main
+// #pragma endregion
+
+
+// #pragma region Main
 
 int main(int argc, char **argv)
 {
+	//wtf menino Fisher
+	/*
 	if (!_DEBUG)
 	{
 		argc--;
 		argv += sizeof(char);
 	}
+	*/
 
 
 	ARQUIVOS *listaBMP = NULL;
@@ -263,11 +321,11 @@ int main(int argc, char **argv)
 
 	processaListaBMP(listaBMP, total);
 
-	printf("Finalizado!");
+	printf("Finalizado!\n");
 
 	free(listaBMP);
 
 
 }
 
-#pragma endregion
+// #pragma endregion
